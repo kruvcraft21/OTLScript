@@ -417,34 +417,6 @@ Unity = {
             self.Fields[self.Utf8ToString(fixvalue32(fieldInfo[1].value))] = fieldInfo[2].value
         end
     end,
-    GetFieldOffsetFromName = function(self, add, NameField) 
-        local AddressClass = fixvalue32(gg.getValues({{address = fixvalue32(add), flags = Unity.MainType}})[1].value)
-        if self.Fields[NameField] == nil then
-            repeat
-                local FieldsCount, FieldsLink, ParentAddressClass = self:GetNumFields(AddressClass), fixvalue32(self:GetLinkFields(AddressClass)), gg.getValues({{address = AddressClass + self.ParentOffset, flags = Unity.MainType}})[1].value
-                for i = 0, FieldsCount - 1 do
-                    local field = FieldsLink + (i * self.FieldsStep)
-                    local fieldInfo = gg.getValues({
-                        {--NameField
-                            address = field,
-                            flags = Unity.MainType
-                        },
-                        {--Offset
-                            address = field + self.FieldsOffset,
-                            flags = gg.TYPE_WORD
-                        },
-                    })
-                    local FieldName = self.Utf8ToString(fixvalue32(fieldInfo[1].value))
-                    self.Fields[FieldName] = fieldInfo[2].value
-                    if FieldName == NameField then return self.Fields[FieldName] end
-                end
-                AddressClass = ParentAddressClass
-            until ParentAddressClass == 0 or self.Fields[NameField] ~= nil
-            return self.Fields[NameField]
-        else 
-            return self.Fields[NameField]
-        end
-    end,
 }
 
 function SetUnityClass(t)
@@ -685,7 +657,7 @@ AchievementData = SetUnityClass({
     GetTableForComlite = function(self, add)
         return {address = add + self.Fields.isComplete, flags = gg.TYPE_BYTE, value = 1}
     end,
-    GetTableForRecesive = function(selfm, add)
+    GetTableForRecesive = function(self, add)
         return {address = add + self.Fields.hasReceiveAward, flags = gg.TYPE_BYTE, value = 0}
     end,
 })
