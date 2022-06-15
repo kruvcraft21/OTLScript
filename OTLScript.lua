@@ -236,10 +236,6 @@ function MyLenTable(t)
     return ret
 end
 
-function DataCheck(address)
-    return (fixvalue32(address) > fixvalue32(data[1].start) and fixvalue32(address) < fixvalue32(data[1]['end']))
-end
-
 Unity = {
     ClassNameOffset = platform and 0x10 or 0x8,
     StaticFieldsOffset = platform and 0xB8 or 0x5C,
@@ -263,7 +259,7 @@ Unity = {
         if (#res > 1) then
             for k,v in ipairs(res) do
                 local assembly = gg.getValues({{address = v.address - Unity.ClassNameOffset,flags = v.flags}})[1].value
-                if (DataCheck(gg.getValues({{address = assembly ,flags = v.flags}})[1].value)) then res[1] = v end
+                if (self.Utf8ToString(gg.getValues({{address = assembly,flags = v.flags}})[1].value):find(".dll")) then res[1] = v end
             end
         end
         if not self.ClassLoad then self:SetFields(res[1].address - Unity.ClassNameOffset) end
@@ -343,7 +339,7 @@ Unity = {
         local num = gg.getValues({{address = strAddress,flags = gg.TYPE_DWORD}})[1].value
         if num > 0 and num < 200 then
             for i = 1, num + 1 do
-                bytes[#bytes + 1] = {address = strAddress + (i * 0x2), flags = gg.TYPE_WORD}
+                bytes[#bytes + 1] = {address = strAddress + (i << 1), flags = gg.TYPE_WORD}
             end
         end
         return #bytes > 0 and tostring(setmetatable(gg.getValues(bytes), {
@@ -729,15 +725,13 @@ UnitSpawn = SetUnityClass({
     end,
 })
 
-heroName = {'hero_quanhuying', 'hero_seebee', 'hero_sakari', 'hero_akaisha', 'hero_olivia', 'hero_oliviaTransformed', 'hero_gangdan', 'hero_katherine', 'hero_hannah', 'hero_hannahShotgun', 'hero_hannahSniper', 'hero_hannahRevolver', 'hero_hillding', 'hero_penhaligon', 'hero_hayfa'}
-
 PropertiesSystemLib = SetUnityClass({
     HackCooldown = function(self)
         for k,v in ipairs(self:GetLocalInstance()) do
             local charDic = Dictionary.string.object.GetAllItems(v.value)
-            for key, value in ipairs(heroName) do
-                if charDic[value] then
-                    Dictionary.string.float.SetItemKey(charDic[value], 'Cooldown', 0)
+            for key, value in pairs(charDic) do
+                if string.find(string.lower(key), 'hero') then
+                    Dictionary.string.float.SetItemKey(value, 'Cooldown', 0)
                 end
             end
         end
