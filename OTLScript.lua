@@ -16,6 +16,7 @@ lang = {
         'ПОЛУЧИТЬ НАГРАДУ ЗА ДОСТИЖЕНИЯ',
         'ВЫПОЛНИТЬ ВСЕ ДНЕВНЫЕ ПОРУЧЕНИЯ',
         'ДНЕВНЫЕ НАГРАДЫ X5',
+        '(ОПАСНО) УСТАНОВИТЬ ОЧКИ АСУРЫ',
         'ВЫХОД'
     },
     ['en_US'] = {
@@ -32,6 +33,7 @@ lang = {
         'GET A REWARD FOR ACHIEVEMENTS',
         'COMPLETE ALL DAILY ERRANDS',
         'DAILY REWARDS X5',
+        '(DANGEROUS) SET ASURA POINTS',
         'EXIT'
     },
 }
@@ -753,6 +755,7 @@ GameProcess = SetUnityClass({
 })
 
 Weapon = SetUnityClass({
+    MaxIdEffects = 201,
     ChangeWeapon = function(self)
         local weapons = {}
         for k,v in ipairs(self:GetInstance()) do
@@ -766,22 +769,22 @@ Weapon = SetUnityClass({
                 {
                     address = data + 0x18, -- characterEffect0
                     flags = gg.TYPE_DWORD,
-                    value = math.random(0, 190)
+                    value = math.random(0, self.MaxIdEffects)
                 },
                 {
                     address = data + 0x1C, -- characterEffect1
                     flags = gg.TYPE_DWORD,
-                    value = math.random(0, 190)
+                    value = math.random(0, self.MaxIdEffects)
                 },
                 {
                     address = data + 0x20, -- characterEffect2
                     flags = gg.TYPE_DWORD,
-                    value = math.random(0, 190)
+                    value = math.random(0, self.MaxIdEffects)
                 },
                 {
                     address = data + 0x24, -- characterEffect3
                     flags = gg.TYPE_DWORD,
-                    value = math.random(0, 190)
+                    value = math.random(0, self.MaxIdEffects)
                 },
             }, 1, 5, #weapons + 1, weapons)
         end
@@ -849,6 +852,14 @@ PlayerArchive = SetUnityClass({
             end
         end
         gg.setValues(floorItems)
+    end,
+    ChangeAsuraPowerPoint = function(self, value)
+        local powerTable = {}
+        for k,v in ipairs(self:GetLocalInstance()) do
+            local _exAsuraPowerPointMax = gg.getValues({{address = v.address + self.Fields._exAsuraPowerPointMax, flags = Unity.MainType}})[1].value
+            table.move(EncryptValue:From(_exAsuraPowerPointMax):SetEncryptValue(value), 1, 2, #powerTable + 1, powerTable)
+        end
+        gg.setValues(powerTable)
     end
 })
 
@@ -899,6 +910,17 @@ functions = {
             gg.alert("ВЫ НЕ ВВЕЛИ КОЛИЧЕСТВО\nYOU DIDN'T ENTER THE QUANTITY") 
         else
             Protect:Call(GameProcess.SetCoin, GameProcess, num[1])
+        end
+    end,
+    ['(DANGEROUS) SET ASURA POINTS'] = function(self)
+        local attemt = gg.alert("ФУНКЦИЯ 'УСТАНОВИТЬ ОЧКИ АСУРЫ' ОПАСНА, ТАК КАК МОЖЕТ ВЫЗВАТЬ БЛОКИРОВКУ АККАУНТА, ВЫ СОГЛАСНЫ С ИСПОЛЬЗОВАНИЕМ ДАННОЙ ФУНКЦИИ ?\nTHE FUNCTION 'SET ASURA POINTS' IS DANGEROUS, AS IT CAN CAUSE ACCOUNT BLOCKING, DO YOU AGREE WITH THE USE OF THIS FUNCTION?", "YES", "NO")
+        if (attemt == 1) then 
+            local num = gg.prompt({'ВВЕДИТЕ НУЖНОЕ КОЛИЧЕСТВО (ФУНКЦИЯ: УСТАНОВИТЬ ОЧКИ АСУРЫ)\nENTER THE REQUIRED AMOUNT (FUNCTION: SET ASURA POINTS)'},{[1] = 5},{'number'})
+            if CheckTableIsNil(num) then 
+                gg.alert("ВЫ НЕ ВВЕЛИ КОЛИЧЕСТВО\nYOU DIDN'T ENTER THE QUANTITY") 
+            else
+                Protect:Call(PlayerArchive.ChangeAsuraPowerPoint, PlayerArchive, num[1])
+            end
         end
     end
 }
