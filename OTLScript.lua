@@ -924,7 +924,7 @@ PlayerArchive = SetUnityClass({
                     if chosenProperty then
                         chosenProperty = asuraProperties[chosenPage][chosenProperty]
                         local num = gg.prompt({'ВВЕДИТЕ НУЖНОЕ КОЛИЧЕСТВО\nENTER THE REQUIRED AMOUNT'},{[1] = 5},{'number'})
-                        if not CheckTableIsNil(num) then 
+                        if (not CheckTableIsNil(num)) and num[1] >= 0 then 
                             local sumInvestPoints = self.GetSumInvestPoint(asuraPower, chosenPage, asuraProperties[chosenPage])
                             local selectId = string.format("scheme_%i_%i", chosenPage, chosenProperty)
                             if asuraPower[selectId] then
