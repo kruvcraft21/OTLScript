@@ -836,6 +836,12 @@ EncryptValue = SetUnityClass({
                 flags = gg.TYPE_DWORD
             }
         }
+    end,
+    GetShowValue = function(self, add)
+        return {
+            address = add + self.Fields._showValue,
+            flags = gg.TYPE_DWORD
+        }
     end
 })
 
