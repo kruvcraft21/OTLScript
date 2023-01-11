@@ -17,6 +17,7 @@ lang = {
         'ВЫПОЛНИТЬ ВСЕ ДНЕВНЫЕ ПОРУЧЕНИЯ',
         'ДНЕВНЫЕ НАГРАДЫ X5',
         '(ОПАСНО) УСТАНОВИТЬ ОЧКИ АСУРЫ',
+        '(ОПАСНО) ИЗМЕНИТЬ СТАТИСТИКУ АСУРЫ',
         'ВЫХОД'
     },
     ['en_US'] = {
@@ -34,6 +35,7 @@ lang = {
         'COMPLETE ALL DAILY ERRANDS',
         'DAILY REWARDS X5',
         '(DANGEROUS) SET ASURA POINTS',
+        '(DANGEROUS) CHANGE ASURA STAT',
         'EXIT'
     },
 }
@@ -57,6 +59,8 @@ langClass = {
         Emtry = 'Пусто',
         ErrorLib = 'Game Guardian не нашёл нужную библиотеку. Скрипт запустится, но будет работать частично некорректно',
         ErrorAlert = 'При выполнении функции произошла ошибка',
+        ChoosePages = 'Выберите страницу',
+        ChooseProperty = 'Выберите свойство'
     },
     ['en_US'] = {
         GameProcess = 'Game Process found',
@@ -76,6 +80,8 @@ langClass = {
         Emtry = 'Emtry',
         ErrorLib = "Game Guardian didn't find the right library. The script will run, but it will work partially incorrectly",
         ErrorAlert = 'An error occurred while executing the function',
+        ChoosePages = 'Select a page',
+        ChooseProperty = 'Select a property'
     },
 }
 
@@ -866,6 +872,72 @@ PlayerArchive = SetUnityClass({
             table.move(EncryptValue:From(_exAsuraPowerPointMax):SetEncryptValue(value), 1, 2, #powerTable + 1, powerTable)
         end
         gg.setValues(powerTable)
+    end,
+    AddAsuraPowerPoint = function(self, delta, investPoints)
+        for k,v in ipairs(self:GetLocalInstance()) do
+            local _exAsuraPowerPointMax = gg.getValues({{address = v.address + self.Fields._exAsuraPowerPointMax, flags = Unity.MainType}})[1].value
+            local encVal = EncryptValue:From(_exAsuraPowerPointMax)
+            delta = gg.getValues({encVal:GetShowValue()})[1].value - investPoints - delta
+            if delta < 0 then
+                gg.setValues(encVal:SetEncryptValue(gg.getValues({encVal:GetShowValue()})[1].value + math.abs(delta)))
+            end
+        end
+    end,
+    GetSumInvestPoint = function(asuraPower, page, pageProperties)
+        local sum = 0
+        local EncryptValues = {}
+        for indexTable, propertyIndex in pairs(pageProperties) do
+            local id = string.format("scheme_%i_%i", page, propertyIndex)
+            EncryptValues[#EncryptValues + 1] = EncryptValue:From(asuraPower[id]):GetShowValue()
+        end 
+        EncryptValues = gg.getValues(EncryptValues)
+        for indexTable = 1, #EncryptValues do 
+            sum = sum + EncryptValues[indexTable].value
+        end
+        return sum
+    end,
+    ChangeStatAsura = function(self)
+        for k, v in ipairs(self:GetLocalInstance()) do
+            local resursDic = gg.getValues({{address = v.address + self.Fields._resourceDic, flags = Unity.MainType}})[1].value
+            local items = Dictionary.int.object.GetAllItems(resursDic)
+            if (items[34]) then
+                local asuraPower = Dictionary.string.object.GetAllItems(items[34])
+                local asuraPagePower = {}
+                local asuraProperties = {}
+                for key, value in pairs(asuraPower) do
+                    if string.find(key, "scheme_(%d+)_(%d+)") then
+                        local page, propertiesIndex = string.match(key, "scheme_(%d+)_(%d+)")
+                        if not (asuraProperties[page]) then
+                            asuraProperties[page] = {propertiesIndex}
+                            asuraPagePower[#asuraPagePower + 1] = page
+                        else 
+                            asuraProperties[page][#(asuraProperties[page]) + 1] = propertiesIndex
+                            table.sort(asuraProperties[page])
+                        end 
+                    end
+                end
+                table.sort(asuraPagePower)
+                local chosenPage = gg.choice(asuraPagePower, nil, lang_main.ChoosePages)
+                if chosenPage then
+                    chosenPage = asuraPagePower[chosenPage]
+                    local chosenProperty = gg.choice(asuraProperties[chosenPage], nil, lang_main.ChooseProperty)
+                    if chosenProperty then
+                        chosenProperty = asuraProperties[chosenPage][chosenProperty]
+                        local num = gg.prompt({'ВВЕДИТЕ НУЖНОЕ КОЛИЧЕСТВО\nENTER THE REQUIRED AMOUNT'},{[1] = 5},{'number'})
+                        if not CheckTableIsNil(num) then 
+                            local sumInvestPoints = self.GetSumInvestPoint(asuraPower, chosenPage, asuraProperties[chosenPage])
+                            local selectId = string.format("scheme_%i_%i", chosenPage, chosenProperty)
+                            if asuraPower[selectId] then
+                                local property = EncryptValue:From(asuraPower[selectId])
+                                local delta = num[1] - gg.getValues({property:GetShowValue()})[1].value
+                                self:AddAsuraPowerPoint(delta, sumInvestPoints)
+                                gg.setValues(EncryptValue:From(asuraPower[selectId]):SetEncryptValue(num[1]))
+                            end
+                        end
+                    end
+                end
+            end 
+        end
     end
 })
 
@@ -927,6 +999,12 @@ functions = {
             else
                 Protect:Call(PlayerArchive.ChangeAsuraPowerPoint, PlayerArchive, num[1])
             end
+        end
+    end,
+    ['(DANGEROUS) CHANGE ASURA STAT'] = function()
+        local attemt = gg.alert("ФУНКЦИЯ 'ИЗМЕНИТЬ СТАТИСТИКУ АСУРЫ' ОПАСНА, ТАК КАК МОЖЕТ ВЫЗВАТЬ БЛОКИРОВКУ АККАУНТА, ВЫ СОГЛАСНЫ С ИСПОЛЬЗОВАНИЕМ ДАННОЙ ФУНКЦИИ ?\nTHE FUNCTION 'CHANGE ASURA STAT' IS DANGEROUS, AS IT CAN CAUSE ACCOUNT BLOCKING, DO YOU AGREE WITH THE USE OF THIS FUNCTION?", "YES", "NO")
+        if (attemt == 1) then 
+            Protect:Call(PlayerArchive.ChangeStatAsura, PlayerArchive)
         end
     end
 }
