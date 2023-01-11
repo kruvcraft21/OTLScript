@@ -904,7 +904,7 @@ functions = {
         local attemt = gg.alert("ФУНКЦИЯ 'ИЗМЕНИТЬ КОЛИЧЕСТВО ФРАГМЕНТОВ СТИЛЯ' ОПАСНА, ТАК КАК МОЖЕТ ВЫЗВАТЬ БЛОКИРОВКУ АККАУНТА, ВЫ СОГЛАСНЫ С ИСПОЛЬЗОВАНИЕМ ДАННОЙ ФУНКЦИИ ?\nTHE FUNCTION 'CHANGE THE NUMBER OF STYLE FRAGMENTS' IS DANGEROUS, AS IT CAN CAUSE ACCOUNT BLOCKING, DO YOU AGREE WITH THE USE OF THIS FUNCTION?", "YES", "NO")
         if (attemt == 1) then Protect:Call(PlayerArchive.ChangeFloorCount, PlayerArchive) end
     end,
-    ['SET COIN COUNT'] = function(self)
+    ['SET COIN COUNT'] = function()
         local num = gg.prompt({'ВВЕДИТЕ НУЖНОЕ КОЛИЧЕСТВО (ФУНКЦИЯ: УСТАНОВИТЬ КОЛИЧЕСТВО МОНЕТ)\nENTER THE REQUIRED AMOUNT (FUNCTION: SET COIN COUNT)'},{[1] = 5},{'number'})
         if CheckTableIsNil(num) then 
             gg.alert("ВЫ НЕ ВВЕЛИ КОЛИЧЕСТВО\nYOU DIDN'T ENTER THE QUANTITY") 
@@ -912,11 +912,11 @@ functions = {
             Protect:Call(GameProcess.SetCoin, GameProcess, num[1])
         end
     end,
-    ['(DANGEROUS) SET ASURA POINTS'] = function(self)
+    ['(DANGEROUS) SET ASURA POINTS'] = function()
         local attemt = gg.alert("ФУНКЦИЯ 'УСТАНОВИТЬ ОЧКИ АСУРЫ' ОПАСНА, ТАК КАК МОЖЕТ ВЫЗВАТЬ БЛОКИРОВКУ АККАУНТА, ВЫ СОГЛАСНЫ С ИСПОЛЬЗОВАНИЕМ ДАННОЙ ФУНКЦИИ ?\nTHE FUNCTION 'SET ASURA POINTS' IS DANGEROUS, AS IT CAN CAUSE ACCOUNT BLOCKING, DO YOU AGREE WITH THE USE OF THIS FUNCTION?", "YES", "NO")
         if (attemt == 1) then 
             local num = gg.prompt({'ВВЕДИТЕ НУЖНОЕ КОЛИЧЕСТВО (ФУНКЦИЯ: УСТАНОВИТЬ ОЧКИ АСУРЫ)\nENTER THE REQUIRED AMOUNT (FUNCTION: SET ASURA POINTS)'},{[1] = 5},{'number'})
-            if CheckTableIsNil(num) then 
+            if CheckTableIsNil(num) and num >= 0 then 
                 gg.alert("ВЫ НЕ ВВЕЛИ КОЛИЧЕСТВО\nYOU DIDN'T ENTER THE QUANTITY") 
             else
                 Protect:Call(PlayerArchive.ChangeAsuraPowerPoint, PlayerArchive, num[1])
