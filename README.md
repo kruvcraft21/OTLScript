@@ -62,5 +62,10 @@ This script is only for Otherworld legends. This script works via [GameGuardian]
 > [Usage example](https://youtu.be/9iVX31o733g)
 13. (DANGEROUS) CHANGE THE NUMBER OF STYLE FRAGMENTS - changes the number of style fragments found. Dangerous because if you change in the wrong place, at the wrong time, it can lead to account blocking.
 > [Usage example](https://youtu.be/V8w9eXw3Alg)
+14. (DANGEROUS) SET ASURA POINTS - changes the number of asura points. Dangerous because if you change in the wrong place, at the wrong time, it can lead to account blocking.
+> [Usage example](https://youtu.be/t6eBnKw5K6k)
+15. (DANGEROUS) CHANGE ASURA STAT - changes statistics for a certain property, on a certain page. Dangerous because if you change in the wrong place, at the wrong time, it can lead to account blocking.
+> [Usage example](https://youtu.be/OYp9f9fzPGU)
+
 
 </details>
