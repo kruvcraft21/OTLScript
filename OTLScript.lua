@@ -852,6 +852,12 @@ EncryptValue = SetUnityClass({
 })
 
 PlayerArchive = SetUnityClass({
+    ChangeMenuSkin = function(self)
+        for k, v in ipairs(self.GetIl2cppFunc('IsMenuSkinUnlock')) do
+            local patch = platform and "\x20\x00\x80\x52\xc0\x03\x5f\xd6" or "\x01\x00\xa0\xe3\x1e\xff\x2f\xe1"
+            setupValues(tonumber(v.AddressInMemory,16), patch, gg.TYPE_QWORD)
+        end
+    end,
     ChangeFloorCount = function(self)
         local floorItems = {}
         for k, v in ipairs(self:GetLocalInstance()) do
@@ -950,6 +956,7 @@ functions = {
     end,
     ['UNLOCK ALL STYLE LOBBY'] = function()
         Protect:Call(MenuSkinUI.UnlockAllSkin, MenuSkinUI)
+        Protect:Call(PlayerArchive.ChangeMenuSkin, PlayerArchive)
     end,
     ['COMPLETE ALL ACHIEVEMENTS'] = function()
         Protect:Call(AchievementManager.CompliteAllAchievement, AchievementManager)
