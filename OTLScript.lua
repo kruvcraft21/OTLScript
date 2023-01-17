@@ -184,7 +184,7 @@ if #libil == 0 then
 end
 
 function setupValues(gf,gm,typeset)
-    gg.setValues({{address = gf,flags = typeset and typeset or gg.TYPE_DWORD,value = gm:gsub('.', function (c) return string.format('%02X', string.byte(c)) end)..'r'}})
+    gg.setValues({{address = gf,flags = typeset or gg.TYPE_DWORD,value = gm:gsub('.', function (c) return string.format('%02X', string.byte(c)) end)..'r'}})
 end
 
 function Il2CppName(NameFucntion)
