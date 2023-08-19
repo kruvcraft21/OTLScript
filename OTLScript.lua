@@ -936,9 +936,9 @@ PlayerArchive = SetUnityClass({
                             local selectId = string.format("scheme_%i_%i", chosenPage, chosenProperty)
                             if asuraPower[selectId] then
                                 local property = EncryptValue:From(asuraPower[selectId])
-                                local delta = num[1] - gg.getValues({property:GetShowValue()})[1].value
+                                local delta = newValue - gg.getValues({property:GetShowValue()})[1].value
                                 self:AddAsuraPowerPoint(delta, sumInvestPoints)
-                                gg.setValues(EncryptValue:From(asuraPower[selectId]):SetEncryptValue(num[1]))
+                                gg.setValues(EncryptValue:From(asuraPower[selectId]):SetEncryptValue(newValue))
                             end
                         end
                     end
