@@ -171,9 +171,9 @@ data, platform, libil = GetAppData()
 
 if #libil == 0 then
     local splitconf = gg.getRangesList('split_config.')
-    gg.setRanges(gg.REGION_CODE_APP)
+    gg.setRanges(gg.REGION_CODE_APP | gg.REGION_OTHER)
     for k,v in ipairs(splitconf) do
-        if (v.state == 'Xa') then
+        if (v.state == 'Xa' or v.state == 'O') then
             gg.searchNumber(':il2cpp',gg.TYPE_BYTE,false,gg.SIGN_EQUAL,v.start,v['end'])
             if (gg.getResultsCount() > 0) then
                 libil[#libil + 1] = v
